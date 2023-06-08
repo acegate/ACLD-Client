@@ -5,79 +5,54 @@ import numpy as np
 import base64
 import time
 from datetime import datetime
-import platform
-import re, uuid
-import json
-from PIL import ImageGrab
-import pyautogui
 from tkinter import *
-
-
-
+from util import Util
 
 class Client:
+    # MAC Address
     def __init__(self, TCP_IP, TCP_PORT):
         self.TCP_IP = TCP_IP
         self.TCP_PORT = TCP_PORT
-        window = Tk()
-
-        self.WINDOW_WIDTH = window.winfo_screenwidth()
-        self.WINDOW_HEIGHT = window.winfo_screenheight()
-        self.X = self.WINDOW_HEIGHT // 2
-        self.Y = self.WINDOW_HEIGHT // 2
-        
-        self.create_computer_infomation()
+        self.utility = Util()
         self.connect()
 
-
-640 x 640
-    def create_computer_infomation(self):
-        info = platform.uname()
-        cumputer_info = {
-            'OS' : info[0],
-            'userName' : socket.gethostname(),
-            'CPU' : info[4],
-            'MACAddress' : ':'.join(re.findall('..', '%012x'%uuid.getnode())),
-        }
-        self.infomation = json.dumps(cumputer_info)
-
-
-    def connect(self):
+    def connect(self) -> None:
         self.client_socket = socket.socket()
         self.client_socket.connect((self.TCP_IP, self.TCP_PORT))
         self.openCV()
 
-    def openCV(self):
+    def openCV(self) -> None:
         self.capture = cv2.VideoCapture(0)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 315)
-
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
 
         while self.capture.isOpened():
             ret, self.frame = self.capture.read()
             if not ret:
                 break
 
-            self.resize_frame = cv2.resize(self.frame, dsize=(480,315), interpolation=cv2.INTER_AREA)
-            encode_data = self.encoding(self.resize_frame)
-            cam_length = str(len(encode_data))
-            info_length = str(len(self.infomation))
-
+            self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_AREA)
             cv2.imshow('PC_cam', self.resize_frame)
 
-
             if cv2.waitKey(1) == ord('q'):
-                pic = pyautogui.screenshot(region=(self.X, self.Y, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
-                img_frame = np.array(pic)
-                encode_picture = self.encoding(img_frame)
-                picture_length = str(len(encode_picture))
-                print(picture_length)
+                cam_img = self.cam_img_encoding(self.resize_frame)
+                screen_shot = self.window_screen_shot()
+                nowtime = self.get_time()
+                
+                # self.utility.create_img(self.resize_frame, self.CAM_IMG_FLAG)
+                # self.utility.create_img(self.screen_shot, self.SCREENSHOT_FLAG)
+                # self.utility.transfer_zip()
+                self.send_recive(screen_shot)
+                # self.send_recive(cam_img)
+                # self.send_recive(nowtime)
 
-                stime = datetime.utcnow().strftime("%Y/%m/%D %H:%M:%S.%f")
+                # print(encode_cam_img)
+                # print(nowtime)
+                # self.send_recive(screen_shot[0], screen_shot[1])
+                # self.send_recive(encode_cam_img[0], encode_cam_img[1])
+                # self.send_recive(nowtime[0], nowtime[1])
+                # self.send_recive(self.computer_info_length, self.computer_info)
 
-                self.send(cam_length, encode_data)
-                self.client_socket.send(stime.encode('utf-8').ljust(64))
-                self.send(info_length, self.infomation.encode('utf-8'))
                 # break
 
             time.sleep(0.095)
@@ -86,26 +61,31 @@ class Client:
         self.capture.release()
         cv2.destroyAllWindows()
         
-    def send(self, length, data):
-        self.client_socket.sendall(length.encode('utf-8').ljust(64))
-        self.client_socket.send(data)
+    def send_recive(self, data) -> None:
+        # self.client_socket.sendall(length.encode('utf-8').ljust(64))
+        self.client_socket.sendall(data)
 
-    def encoding(self, image_frame):
-        encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-        result, imgencode = cv2.imencode('.jpg', image_frame, encode_param)
-        data = np.array(imgencode)
-        StringData = base64.b64encode(data)
-        return StringData
+
+    def get_time(self) -> tuple:
+        nowtime = datetime.utcnow().strftime("%Y/%m/%D %H:%M:%S.%f")
+        # nowtime_length = str(len(nowtime))
+        return nowtime
+
+    def cam_img_encoding(self, image_frame) -> tuple:
+        encode_param=[int(cv2.IMWRITE_JPEG_QUALITY), 60]
+        result, imgencode = cv2.imencode('.png', image_frame, encode_param)
+        data = np.array(image_frame)
+        img_to_byte = base64.b64encode(data)
+        # cam_img_length = str(len(string_data))
+        return img_to_byte
     
-    def window_screen_shot(self):
-        img = ImageGrab.grab()
-        imgCrop = img.crop((self.X, self.Y, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
-        saveas = f"{'windowscreen'}{'.png'}"
-        # imgCrop.save(saveas)
-        return saveas
-
-
-HOST = '192.168.50.129'
+    def window_screen_shot(self) -> tuple:
+        img = np.array(self.utility.screen_shot())
+        img_to_byte = base64.b64encode(img)
+        # screen_shot_length = str(len(string_data))
+        return img_to_byte
+    
+HOST = '192.168.50.131'
 PORT = 9999
 
 client = Client(HOST, PORT)
