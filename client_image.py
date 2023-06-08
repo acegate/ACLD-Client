@@ -81,11 +81,12 @@ class Client:
     
     def window_screen_shot(self) -> tuple:
         img = np.array(self.utility.screen_shot())
-        img_to_byte = base64.b64encode(img)
+        data = np.array(img)
+        img_to_byte = base64.b64encode(data)
         # screen_shot_length = str(len(string_data))
         return img_to_byte
     
-HOST = '192.168.50.131'
+HOST = '192.168.101.1'
 PORT = 9999
 
 client = Client(HOST, PORT)
