@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 import platform
-import json
 import re, uuid
 import socket
 from tkinter import *
@@ -16,20 +15,18 @@ class Util:
         self.WINDOW_HEIGHT = window.winfo_screenheight()
         self.create_cominfo_to_json()
 
-    def create_cominfo_to_json(self) -> None:
+    def create_cominfo_to_json(self) -> dict:
         info = platform.uname()
         temp = {
-            'OS' : info[0],
             'IP' : socket.gethostname(),
             'userName' : info[1],
             'MACAddress' : ':'.join(re.findall('..', '%012x'%uuid.getnode())),
         }
-        self.__computer_info = json.dumps(temp)
-        # self.computer_info_length = str(len(self.computer_info))
+        return temp
 
-    def screen_shot(self):
-        screen_shot = pyautogui.screenshot(region=(self.X, self.Y, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
-        return screen_shot
+    def screen_shot(self) -> Image:
+        return pyautogui.screenshot(region=(self.X, self.Y, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        
 
     def get_rootpath(self):
         return self.__path
