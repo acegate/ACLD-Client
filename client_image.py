@@ -80,7 +80,7 @@ class Client:
         data_length = str(len(to_json_data))
         return (to_json_data, data_length)
     
-HOST = '192.168.50.131'
+HOST = '192.168.101.1'
 PORT = 9999
 
 client = Client(HOST, PORT)
