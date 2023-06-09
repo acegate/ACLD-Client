@@ -24,8 +24,10 @@ class Util:
 
     def create_cominfo_to_json(self) -> dict:
         info = platform.uname()
+        host_name = socket.gethostname()
+
         temp = {
-            'IP' : socket.gethostname(),
+            'IP' : socket.gethostbyname(host_name),
             'userName' : info[1],
             'MACAddress' : ':'.join(re.findall('..', '%012x'%uuid.getnode())),
         }
