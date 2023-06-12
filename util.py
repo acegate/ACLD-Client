@@ -38,11 +38,6 @@ class Util:
         return cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
 
 
-    def get_rootpath(self):
-        return self.__path
-    
-    def get_computer_info(self):
-        return self.__computer_info
 
     
 
