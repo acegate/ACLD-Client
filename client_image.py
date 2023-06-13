@@ -96,6 +96,3 @@ class Client:
         return self.__TCP_PORT
     
 
-HOST = '192.168.50.187'
-PORT = 9999
-window = Window(HOST, PORT)
