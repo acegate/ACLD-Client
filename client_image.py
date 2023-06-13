@@ -8,16 +8,15 @@ from datetime import datetime
 from tkinter import *
 from util import Util
 import json
-from .model import ModelYolo
-from .window import Window
+from model import ModelYolo
     
 class Client:
     # MAC Address
     def __init__(self, TCP_IP, TCP_PORT):
         self.__TCP_IP = TCP_IP
-        self.__TCP_PORT = TCP_PORT
+        self.__TCP_PORT = int(TCP_PORT)
         self.__utility = Util()
-        self.model = ModelYolo()
+        # self.model = ModelYolo()
         self.connect()
 
     def connect(self) -> None:
@@ -37,22 +36,22 @@ class Client:
 
             self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_AREA)
             cv2.imshow('PC_cam', self.resize_frame)
-            results = self.model.model(self.resize_frame)
-            results.show()
-            isFlag = False
-            for value in results.pandas().xyxy[0].confidence.values:
-                if value >= 0.6:
-                    isFlag = True
+            # results = self.model.model(self.resize_frame)
+            # results.show()
+            # isFlag = False
+            # for value in results.pandas().xyxy[0].confidence.values:
+            #     if value >= 0.6:
+            #         isFlag = True
 
-            if isFlag:
-                cam_img, cam_length = self.img_encoding(self.resize_frame)
-                screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
-                data, data_length = self.get_infomation()
+            # if isFlag:
+            #     cam_img, cam_length = self.img_encoding(self.resize_frame)
+            #     screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
+            #     data, data_length = self.get_infomation()
 
-                self.sendall(cam_img, cam_length)
-                self.sendall(screen_shot, screen_shot_length)
-                self.sendall(data, data_length)
-                print('send...')
+            #     self.sendall(cam_img, cam_length)
+            #     self.sendall(screen_shot, screen_shot_length)
+            #     self.sendall(data, data_length)
+            #     print('send...')
             
             time.sleep(1)
         

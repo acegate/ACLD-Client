@@ -1,5 +1,7 @@
 from tkinter import *
-from .client_image import Client
+from client_image import Client
+import threading
+
 
 class Window:
     def __init__(self, HOST, PORT):
@@ -41,8 +43,9 @@ class Window:
         sabon = self.get_sabon_input_text().get()
         HOST = self.get_host_input_text().get()
         PORT = self.get_port_input_text().get()
-        client = Client(HOST, PORT)
-
+        thread = threading.Thread(target=Client, args=(HOST, PORT))
+        thread.start()
+        self.get_window().destroy()
 
 
     def get_port_input_text(self):
@@ -75,6 +78,6 @@ class Window:
     def get_port(self):
         return self.__PORT
 
-HOST = '192.168.50.187'
+HOST = '192.168.50.131'
 PORT = 9999
 window = Window(HOST, PORT)
