@@ -3,7 +3,9 @@ import tkinter
 
 
 class Window:
-    def __init__(self):
+    def __init__(self, HOST, PORT):
+        self.__HOST = HOST
+        self.__PORT = PORT
         self.__window = tkinter.Tk()
         self.__WINDOW_WIDTH = 200
         self.__WINDOW_HEIGHT = 100
@@ -21,12 +23,19 @@ class Window:
     def attachForm(self):
         sabon_label = Label(self.get_window(), text='사번').grid(row=0, column=0)
         host_label = Label(self.get_window(), text='HOST').grid(row=1,column=0)
+        port_label = Label(self.get_window(), text='사번').grid(row=2, column=0)
 
         self.sabon_input_text = Entry(self.get_window())
         self.get_sabon_input_text().grid(row=0,column=1)
 
+
         self.host_input_text = Entry(self.get_window())
         self.get_host_input_text().grid(row=1,column=1)
+        self.get_host_input_text().insert(self.get_host())
+
+        self.port_input_text = Entry(self.get_window())
+        self.get_port_input_text().grid(row=2,column=1)
+        self.get_port_input_text().insert(self.get_port())
 
         button = Button(self.get_window(), text='등록',bg='blue', width=10, fg='white', command=self.clicked).grid(row=2,column=1)
 
@@ -34,6 +43,9 @@ class Window:
         sabon = self.get_sabon_input_text().get()
         HOST = self.get_host_input_text().get()
         print(sabon, HOST)
+
+    def get_port_input_text(self):
+        return self.port_input_text
 
     def get_sabon_input_text(self):
         return self.sabon_input_text
@@ -55,7 +67,10 @@ class Window:
     
     def get_Y(self):
         return self.__Y
+    
+    def get_host(self):
+        return self.__HOST
+    
+    def get_port(self):
+        return self.__PORT
 
-
-
-window = Window()
