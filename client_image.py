@@ -12,7 +12,8 @@ from model import ModelYolo
     
 class Client:
     # MAC Address
-    def __init__(self, TCP_IP, TCP_PORT):
+    def __init__(self, TCP_IP, TCP_PORT, saborn):
+        self.__saborn = saborn
         self.__TCP_IP = TCP_IP
         self.__TCP_PORT = int(TCP_PORT)
         self.__utility = Util()

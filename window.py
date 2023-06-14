@@ -26,8 +26,8 @@ class Window:
         host_label = Label(self.get_window(), text='HOST').grid(row=1,column=0)
         port_label = Label(self.get_window(), text='포트').grid(row=2, column=0)
 
-        self.sabon_input_text = Entry(self.get_window())
-        self.get_sabon_input_text().grid(row=0,column=1)
+        self.saborn_input_text = Entry(self.get_window())
+        self.get_saborn_input_text().grid(row=0,column=1)
 
         self.host_input_text = Entry(self.get_window())
         self.get_host_input_text().grid(row=1,column=1)
@@ -40,10 +40,10 @@ class Window:
         button = Button(self.get_window(), text='등록',bg='blue', width=10, fg='white', command=self.clicked).grid(row=3,column=1)
 
     def clicked(self):
-        sabon = self.get_sabon_input_text().get()
+        saborn = self.get_saborn_input_text().get()
         HOST = self.get_host_input_text().get()
         PORT = self.get_port_input_text().get()
-        thread = threading.Thread(target=Client, args=(HOST, PORT))
+        thread = threading.Thread(target=Client, args=(HOST, PORT, saborn))
         thread.start()
         self.get_window().destroy()
 
@@ -51,8 +51,8 @@ class Window:
     def get_port_input_text(self):
         return self.port_input_text
 
-    def get_sabon_input_text(self):
-        return self.sabon_input_text
+    def get_saborn_input_text(self):
+        return self.saborn_input_text
     
     def get_host_input_text(self):
         return self.host_input_text
