@@ -61,8 +61,13 @@ class Client:
             #     self.sendall(screen_shot, screen_shot_length)
             #     self.sendall(data, data_length)
             #     print('send...')
+
+            if cv2.waitKey(0) == ord('q'):
+                data, data_length = self.get_infomation()
+                self.sendall(data, data_length)
+
             
-            cv2.waitKey(1)
+            # cv2.waitKey(1)
             time.sleep(1)
         
         self.client_socket.close()

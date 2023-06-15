@@ -78,17 +78,22 @@ class DataBase:
     def insertIdentify(self):
         sql = "INSERT INTO identify(emp_no, agent_no, IP, MAC) VALUES(?, ?, ?, ?)"
         IPES = []
+        MACES = []
         with open('./DataBase/ip_range.txt', encoding='utf-8') as file:
             for line in file:
                 IPES.append(line)
+
+        with open('./DataBase/random_macaddress.txt', encoding='utf-8') as file:
+            for line in file:
+                MACES.append(line)
         try:
             for i in range(10000):
-                rand_agent_no = random.choice(range(1, 1001))
-                rand_detectiontype = random.choice(range(3))
-                rand_status = random.choice(range(3))
+                rnd_no = random.choice(range(1000, 2000))
+                rnd_IP = random.choice(IPES)
+                rnd_MAC = random.choice(MACES)
 
                 self.get_cursor().execute(sql,
-                    (rand_agent_no, 'C:/cam_img/', 'C:/screenshot/', rand_detectiontype, rand_status)
+                    (rnd_no, rnd_no-999, rnd_IP, rnd_MAC)
                 )
                 self.get_connection().commit()
         except Exception as e:
@@ -179,4 +184,4 @@ PORT = 3306
 db_name = 'acdd'
 
 database = DataBase(user_name, user_pwd, HOST, PORT, db_name)
-database.insertReport()
+database.insertIdentify()
