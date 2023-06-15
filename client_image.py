@@ -16,13 +16,19 @@ class Client:
     def __init__(self, TCP_IP, TCP_PORT, saborn):
         self.__saborn = saborn
         self.__TCP_IP = TCP_IP
-        self.__TCP_PORT = int(TCP_PORT)
+        self.__TCP_PORT = TCP_PORT
         self.__utility = Util()
         # self.model = ModelYolo()
         self.connect()
 
     def connect(self) -> None:
+
         self.client_socket = socket.socket()
+        self.client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 1)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 3)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 1)
+        
         self.client_socket.connect((self.get_host(), self.get_port()))
         self.openCV()
 
@@ -36,8 +42,9 @@ class Client:
             if not ret:
                 break
 
-            self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_AREA)
+            self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_LINEAR)
             cv2.imshow('PC_cam', self.resize_frame)
+
             # results = self.model.model(self.resize_frame)
             # results.show()
             # isFlag = False
@@ -55,6 +62,7 @@ class Client:
             #     self.sendall(data, data_length)
             #     print('send...')
             
+            cv2.waitKey(1)
             time.sleep(1)
         
         self.client_socket.close()
