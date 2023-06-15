@@ -96,38 +96,11 @@ class Client:
     
     def get_saborn(self):
         return self.__saborn
-    
-
-# SSE 발생 함수
-def sse_event_generator():
-    while True:
-        # SSE 이벤트 형식에 맞게 데이터를 생성
-        event_data = 'data: SSE event data\n\n'
-        yield event_data
-        time.sleep(1)
-
-# SSE 요청을 처리하는 함수
-def handle_sse_request(request):
-    # 필요한 헤더 설정
-    request.send_response(200)
-    request.send_header('Content-Type', 'text/event-stream')
-    request.send_header('Cache-Control', 'no-cache')
-    request.send_header('Connection', 'keep-alive')
-    request.end_headers()
-
-    # SSE 이벤트를 생성하는 generator
-    event_generator = sse_event_generator()
-
-    # SSE 이벤트를 클라이언트에게 전송
-    for event_data in event_generator:
-        request.wfile.write(event_data.encode())
-
-# 서버 생성 및 요청 처리
-server = socketserver.TCPServer(('localhost', 8010), socketserver.BaseRequestHandler)
-server.handle_request = handle_sse_request
-server.serve_forever()
 
 
+HOST = '192.168.50.131'
+PORT = 9999
+client = Client(HOST, PORT, 333)
 
 
 

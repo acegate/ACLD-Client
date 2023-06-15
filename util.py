@@ -20,7 +20,7 @@ class Util:
         self.WINDOW_HEIGHT = window.winfo_screenheight()
         self.X = 0
         self.Y = 0
-        self.create_infomation()
+    
 
     def create_infomation(self, saborn) -> dict:
         info = platform.uname()
