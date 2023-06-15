@@ -19,14 +19,33 @@ class DataBase:
             print(f'Connection Error : {e}')
             sys.exit(1)
 
+
+    def insertDepartment(self):
+        sql = "INSERT INTO department(depmt_name, landline, location) VALUES(?, ?, ?)"
+        part = ['경영지원', '영업', '기술', '생산', '총무', '경리', '구매', '인사', '자재', '홍보', '유통', '품질관리', '보수', '연구실', '인재개발', '국내판매', '해외판매', '개발']
+        try:
+            for i in range(1, len(part)+1):
+                rnd_flow = random.choice(range(1, 6))
+                rnd_ho = random.choice(range(1, 6))
+                location = f'디지털 구로구 {rnd_flow}층 {rnd_flow}0{rnd_ho}호'
+                rnd_name = random.choice(part)
+
+                self.get_cursor().execute(sql,
+                    (rnd_name, 5000+i, location)
+                )
+                self.get_connection().commit()
+        except Exception as e:
+            print(f"Insert Error : {e}")
+            sys.exit(1)
+        finally:
+            self.close()
+
     def insertEmployee(self):
-        sql = "INSERT INTO Employee(emp_no, workdept, emp_name, emp_img_path, phone_no, email, address, gender, rank, hiredate) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        sql = "INSERT INTO Employee(emp_no, depmt_no, emp_name, emp_img_path, phone_no, email, rank) VALUES(?, ?, ?, ?, ?, ?, ?)"
         names = ['박현주', '양승진', '이남일', '윤정자', '고원식', '황보원자', '성우현', '복기하', '김문옥', '신형우', '류범석', '고도현', '최수혁', '조윤혜', '양현우', '탁우재', '정상준', '권보경', '성정숙', '유해준']
         phones = []
         emails = []
-        addresses = []
-        local_path = 'C:/Users/user/Searches/'
-        timestamps = []
+        emp_img_path = 'C:/Users/user/media/'
 
         with open('./DataBase/phone_lists.txt', encoding='utf-8') as file:
             for line in file:
@@ -36,79 +55,32 @@ class DataBase:
             for line in file:
                 emails.append(line)
 
-        with open('./DataBase/random_addresses.txt', encoding='utf-8') as file:
-            for line in file:
-                addresses.append(line)
-
-        with open('./DataBase/random_hire_dates.txt', encoding='utf-8') as file:
-            for line in file:
-               timestamps.append(line)
-        timestamps = list(map(int, timestamps))
-
-        count = 1000
-        for i in range(1000):
-            part_no = random.choice(range(2, 20))
-            phone_no = random.choice(range(1, 10))
-            rank_no = random.choice(range(1, 7))
-            name = random.choice(names)
-            email = random.choice(emails)
-            phone_no = random.choice(phones)
-            address = random.choice(addresses)
-            gender = random.choice(['M', 'F'])
-            timestamp = random.choice(timestamps)
-
-            try:
+        emp_no = 1000
+        try:
+            for i in range(1000):
+                depmt_no = random.choice(range(1, 19))
+                emp_name = random.choice(names)
+                phone_no = random.choice(phones)
+                email = random.choice(emails)
+                rnd_rank = random.choice(range(5))
                 self.get_cursor().execute(sql, 
-                (count + i, part_no, name, local_path, phone_no, email, address, gender, rank_no, datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
-                )
-                self.get_connection().commit()
-            except Exception as e:
-                print(f"Insert Error : {e}")
-                sys.exit(1)
-
-
-
-
-
-    def insertAddress(self):
-        sql = "INSERT INTO location(loc_name) VALUES(?)"
-
-        address = [
-            '경기도 남양주시 화도읍 가구단지중앙길 13-8 12178', '경기도 부천시 범박로 16-8(범박동) 14783',
-            '경상남도 밀양시 멍에실로 63-18(가곡동) 50446' , '경상남도 양산시 상북면 충렬로 1123-99 50579',
-        ]
-
-        try:
-            for i in range(1, 6):
-                rnd_address = random.choice(address)
-
-                self.get_cursor().execute(sql,
-                        (rnd_address, )
-                )
-                self.get_connection().commit()
-            
-        except Exception as e:
-            print(f"Insert Error : {e}")
-            sys.exit(1)
-
-    def insertDepartment(self):
-        sql = "INSERT INTO department(location, depmt_name, landline) VALUES(?, ?, ?)"
-        part = ['경영지원', '영업', '기술', '생산', '총무', '경리', '구매', '인사', '자재', '홍보', '유통', '품질관리', '보수', '연구실', '인재개발', '국내판매', '해외판매', '개발']
-        try:
-            for i in range(1, len(part)+1):
-                rand_location = random.choice(range(1, 6))
-
-                self.get_cursor().execute(sql,
-                    (rand_location, part[i-1], 5000+i)
+                (emp_no + i, depmt_no, emp_name, emp_img_path, phone_no, email, rnd_rank)
                 )
                 self.get_connection().commit()
         except Exception as e:
             print(f"Insert Error : {e}")
             sys.exit(1)
+        finally:
+            self.close()
 
-    def insertLog(self):
-        sql = "INSERT INTO log(agent_no_FK, CAM_path, screen_path, detectiontype, status) VALUES(?, ?, ?, ?, ?)"
+    
 
+    def insertIdentify(self):
+        sql = "INSERT INTO identify(emp_no, agent_no, IP, MAC) VALUES(?, ?, ?, ?)"
+        IPES = []
+        with open('./DataBase/ip_range.txt', encoding='utf-8') as file:
+            for line in file:
+                IPES.append(line)
         try:
             for i in range(10000):
                 rand_agent_no = random.choice(range(1, 1001))
@@ -124,36 +96,46 @@ class DataBase:
             sys.exit(1)
 
 
-
-    def insertAgent(self):
-        sql = "INSERT INTO agent(emp_no_FK, MAC_Address, IP, agent_number) VALUES(?, ?, ?, ?)"
-        mac_addresses = []
-        ipes = []
-
-        with open('./DataBase/random_macaddress.txt', encoding='utf-8') as file:
-            for line in file:
-                mac_addresses.append(line)
-
-        with open('./DataBase/random_ip_addresses.txt', encoding='utf-8') as file:
-            for line in file:
-                ipes.append(line)
+    def insertDetection(self):
+        sql = "INSERT INTO dection(agent_no, CAM_path, screen_path, detectiontype, status) VALUES(?, ?, ?, ?, ?)"
 
         try:
-            for i in range(1, 1001):
-                rnd_emp_no = range(1000, 2000)
-                rnd_mac = random.choice(mac_addresses)
-                rnd_ip = random.choice(ipes)
+            for i in range(10000):
+                rnd_aget_no = random.choice(range(1, 1001))
+                rnd_detectiontype = random.choice(range(2))
+                rnd_status = random.choice(range(3))
 
                 self.get_cursor().execute(sql,
-                    (rnd_emp_no[i-1], rnd_mac, rnd_ip, i)
+                    (rnd_aget_no, 'C:/cam_img/', 'C:/screenshot/', rnd_detectiontype, rnd_status)
                 )
                 self.get_connection().commit()
         except Exception as e:
             print(f"Insert Error : {e}")
             sys.exit(1)
+        finally:
+            self.close()
+
+
+
+    def insertAgent(self):
+        sql = "INSERT INTO agent(status) VALUES(?)"
+
+        try:
+            for i in range(1000):
+                status_no = random.choice(range(2))
+
+                self.get_cursor().execute(sql,
+                    (status_no, )
+                )
+                self.get_connection().commit()
+        except Exception as e:
+            print(f"Insert Error : {e}")
+            sys.exit(1)
+        finally:
+            self.close()
 
     def insertReport(self):
-        sql = "INSERT INTO report(log_no_FK, content, status) VALUES(?, ?, ?)"
+        sql = "INSERT INTO report(dect_no, content, status) VALUES(?, ?, ?)"
         contents = []
 
         with open('./DataBase/context.txt', encoding='utf-8') as file:
@@ -161,16 +143,18 @@ class DataBase:
                 contents.append(line)
         try:
             for i in range(10000):
-                rnd_log_no = random.choice(range(1, 10001))
+                rnd_dect_no = random.choice(range(1, 10001))
                 rnd_content = random.choice(range(len(contents)))
                 status = random.choice(range(3))
                 self.get_cursor().execute(sql,
-                    (rnd_log_no, contents[rnd_content], status)
+                    (rnd_dect_no, contents[rnd_content], status)
                 )
                 self.get_connection().commit()
         except Exception as e:
             print(f"Insert Error : {e}")
             sys.exit(1)
+        finally:
+            self.close()
 
 
     def get_cursor(self):
@@ -188,7 +172,6 @@ class DataBase:
         return self.__conn
 
 
-
 user_name = 'root'
 user_pwd = '1735'
 HOST = '192.168.50.131'
@@ -196,13 +179,4 @@ PORT = 3306
 db_name = 'acdd'
 
 database = DataBase(user_name, user_pwd, HOST, PORT, db_name)
-
-# database.insertAddress()
-# database.insertDepartment()
-# database.insertEmployee()
-
-# database.insertAgent()
-# database.insertLog()
 database.insertReport()
-
-

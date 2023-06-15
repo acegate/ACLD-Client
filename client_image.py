@@ -9,6 +9,7 @@ from tkinter import *
 from util import Util
 import json
 from model import ModelYolo
+import socketserver
     
 class Client:
     # MAC Address
@@ -75,16 +76,14 @@ class Client:
     
 
     def get_infomation(self) -> tuple:
-        data = self.get_util().create_cominfo_to_json()
+        data = self.get_util().create_infomation(self.get_saborn())
         data['datetime'] = self.get_time()
         to_json_data = json.dumps(data).encode('utf-8')
         data_length = str(len(to_json_data))
         return (to_json_data, data_length)
     
-    
     def get_time(self) -> tuple:
         return datetime.utcnow().strftime("%Y/%m/%D %H:%M:%S")
-    
    
     def get_util(self):
         return self.__utility
@@ -95,4 +94,42 @@ class Client:
     def get_port(self):
         return self.__TCP_PORT
     
+    def get_saborn(self):
+        return self.__saborn
+    
+
+# SSE 발생 함수
+def sse_event_generator():
+    while True:
+        # SSE 이벤트 형식에 맞게 데이터를 생성
+        event_data = 'data: SSE event data\n\n'
+        yield event_data
+        time.sleep(1)
+
+# SSE 요청을 처리하는 함수
+def handle_sse_request(request):
+    # 필요한 헤더 설정
+    request.send_response(200)
+    request.send_header('Content-Type', 'text/event-stream')
+    request.send_header('Cache-Control', 'no-cache')
+    request.send_header('Connection', 'keep-alive')
+    request.end_headers()
+
+    # SSE 이벤트를 생성하는 generator
+    event_generator = sse_event_generator()
+
+    # SSE 이벤트를 클라이언트에게 전송
+    for event_data in event_generator:
+        request.wfile.write(event_data.encode())
+
+# 서버 생성 및 요청 처리
+server = socketserver.TCPServer(('localhost', 8010), socketserver.BaseRequestHandler)
+server.handle_request = handle_sse_request
+server.serve_forever()
+
+
+
+
+
+
 
