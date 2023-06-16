@@ -73,8 +73,6 @@ class DataBase:
         finally:
             self.close()
 
-    
-
     def insertIdentify(self):
         sql = "INSERT INTO identify(emp_no, agent_no, IP, MAC) VALUES(?, ?, ?, ?)"
         IPES = []
@@ -103,7 +101,7 @@ class DataBase:
 
     def insertDetection(self):
         sql = "INSERT INTO dection(agent_no, CAM_path, screen_path, detectiontype, status) VALUES(?, ?, ?, ?, ?)"
-
+        
         try:
             for i in range(10000):
                 rnd_aget_no = random.choice(range(1, 1001))
