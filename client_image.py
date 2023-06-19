@@ -9,16 +9,14 @@ from tkinter import *
 from util import Util
 import json
 from model import ModelYolo
-import socketserver
     
 class Client:
-    # MAC Address
     def __init__(self, TCP_IP, TCP_PORT, saborn):
         self.__saborn = saborn
         self.__TCP_IP = TCP_IP
         self.__TCP_PORT = TCP_PORT
         self.__utility = Util()
-        # self.model = ModelYolo()
+        self.model = ModelYolo()
         self.connect()
 
     def connect(self) -> None:
@@ -45,7 +43,14 @@ class Client:
             self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_LINEAR)
             cv2.imshow('PC_cam', self.resize_frame)
 
-            if cv2.waitKey() == ord('q'):
+            results = self.model.model(self.resize_frame)
+            results.show()
+            isFlag = False
+            for value in results.pandas().xyxy[0].confidence.values:
+                if value >= 0.6:
+                    isFlag = True
+
+            if isFlag:
                 cam_img, cam_length = self.img_encoding(self.resize_frame)
                 screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
                 data, data_length = self.get_infomation()
@@ -53,23 +58,7 @@ class Client:
                 self.sendall(cam_img, cam_length)
                 self.sendall(screen_shot, screen_shot_length)
                 self.sendall(data, data_length)
-
-            # results = self.model.model(self.resize_frame)
-            # results.show()
-            # isFlag = False
-            # for value in results.pandas().xyxy[0].confidence.values:
-            #     if value >= 0.6:
-            #         isFlag = True
-
-            # if isFlag:
-            #     cam_img, cam_length = self.img_encoding(self.resize_frame)
-            #     screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
-            #     data, data_length = self.get_infomation()
-
-            #     self.sendall(cam_img, cam_length)
-            #     self.sendall(screen_shot, screen_shot_length)
-            #     self.sendall(data, data_length)
-            #     print('send...')
+                print('send...')
             
             # cv2.waitKey(1)
             time.sleep(1)
@@ -81,7 +70,6 @@ class Client:
     def sendall(self, data, length) -> None:
         self.client_socket.sendall(length.encode('utf-8').ljust(64))
         self.client_socket.send(data)
-
 
     def img_encoding(self, image_frame) -> tuple:
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 60]
@@ -113,10 +101,5 @@ class Client:
     
     def get_saborn(self):
         return self.__saborn
-
-
-HOST = '192.168.50.131'
-PORT = 9999
-client = Client(HOST, PORT, 333)
 
 

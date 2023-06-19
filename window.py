@@ -44,7 +44,6 @@ class Window:
         HOST = self.get_host_input_text().get()
         PORT = self.get_port_input_text().get()
         
-
         thread = threading.Thread(target=Client, args=(HOST, PORT, saborn))
         thread.start()
         self.get_window().destroy()

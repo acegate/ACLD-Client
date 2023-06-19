@@ -7,6 +7,8 @@ from tkinter import *
 import pyautogui
 import cv2
 import numpy as np
+import getmac
+
 
 class Util:
     def __init__(self):
@@ -28,7 +30,7 @@ class Util:
         temp = {
             'IP' : socket.gethostbyname(host_name),
             'userName' : info[1],
-            'MACAddress' : ':'.join(re.findall('..', '%012x'%uuid.getnode())),
+            'MACAddress' : getmac.get_mac_address().replace(':', '-'),
             'saborn' : saborn,
         }
         return temp
