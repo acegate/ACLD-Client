@@ -20,9 +20,8 @@ class Util:
         self.WINDOW_HEIGHT = window.winfo_screenheight()
         self.X = 0
         self.Y = 0
-        self.create_cominfo_to_json()
 
-    def create_cominfo_to_json(self) -> dict:
+    def create_infomation(self, saborn) -> dict:
         info = platform.uname()
         host_name = socket.gethostname()
 
@@ -30,15 +29,10 @@ class Util:
             'IP' : socket.gethostbyname(host_name),
             'userName' : info[1],
             'MACAddress' : ':'.join(re.findall('..', '%012x'%uuid.getnode())),
+            'saborn' : saborn,
         }
         return temp
 
     def screen_shot(self) -> Image:
         screenshot = pyautogui.screenshot(region=(self.X, self.Y, self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         return cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
-
-
-
-    
-
-    

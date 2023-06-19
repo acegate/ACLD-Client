@@ -9,21 +9,13 @@ from tkinter import *
 from util import Util
 import json
 import torch
+from model import ModelYolo
 
-class ModelYolo:
-    def __init__(self):
-        # self.model = torch.hub.load('ultralytics/yolov5', 'custom', path='Lens_best.pt', source='local') # yolov5n - yolov5x6 or custom
-        # CUDA 장치 설정
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        if device.type == 'cuda': 
-            torch.cuda.set_device(0)  #원하는 GPU 장치 번호로 설정
-        # 모델 로드
-        self.model = torch.hub.load('./ultralytics/yolov5', 'custom', path='SmartPhone_best.pt', source='local')
-        self.model.to(device)  # 모델을 GPU로 이동
     
 class Client:
     # MAC Address
-    def __init__(self, TCP_IP, TCP_PORT):
+    def __init__(self, TCP_IP, TCP_PORT, saborn):
+        self.__saborn = saborn
         self.__TCP_IP = TCP_IP
         self.__TCP_PORT = TCP_PORT
         self.__utility = Util()
@@ -31,7 +23,13 @@ class Client:
         self.connect()
 
     def connect(self) -> None:
+
         self.client_socket = socket.socket()
+        self.client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 1)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 3)
+        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 1)
+        
         self.client_socket.connect((self.get_host(), self.get_port()))
         self.openCV()
 
@@ -45,17 +43,17 @@ class Client:
             if not ret:
                 break
 
-            self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_AREA)
+            self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_LINEAR)
             cv2.imshow('PC_cam', self.resize_frame)
             results = self.model.model(self.resize_frame)  # 수정됨
-            # results.show()
+            # results.print()
+            results.show()
+            # DataFrame
+            # print(results.pandas().xyxy[0][])
+            # Series
+            # print(results.pandas().xyxy[0].confidence.values)
 
-            isFlag = False
-            for value in results.pandas().xyxy[0].confidence.values:
-                if value >= 0.6:
-                    isFlag = True
-
-            if isFlag:
+            if results.pandas().xyxy[0].confidence >= 0.6:
                 cam_img, cam_length = self.img_encoding(self.resize_frame)
                 screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
                 data, data_length = self.get_infomation()
@@ -63,9 +61,7 @@ class Client:
                 self.sendall(cam_img, cam_length)
                 self.sendall(screen_shot, screen_shot_length)
                 self.sendall(data, data_length)
-                print('데이터를 보냈습니다...')
 
-            cv2.waitKey(1)
             time.sleep(1)
         
         self.client_socket.close()
@@ -87,16 +83,14 @@ class Client:
     
 
     def get_infomation(self) -> tuple:
-        data = self.get_util().create_cominfo_to_json()
+        data = self.get_util().create_infomation(self.get_saborn())
         data['datetime'] = self.get_time()
         to_json_data = json.dumps(data).encode('utf-8')
         data_length = str(len(to_json_data))
         return (to_json_data, data_length)
     
-    
     def get_time(self) -> tuple:
         return datetime.utcnow().strftime("%Y/%m/%D %H:%M:%S")
-    
    
     def get_util(self):
         return self.__utility
@@ -107,7 +101,5 @@ class Client:
     def get_port(self):
         return self.__TCP_PORT
     
-HOST = '192.168.50.131'
-PORT = 9999
 
-client = Client(HOST, PORT)
+
