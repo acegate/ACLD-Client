@@ -18,7 +18,7 @@ class ModelYolo:
         if device.type == 'cuda': 
             torch.cuda.set_device(0)  #원하는 GPU 장치 번호로 설정
         # 모델 로드
-        self.model = torch.hub.load('./ultralytics/yolov5', 'custom', path='best_sss.pt', source='local')
+        self.model = torch.hub.load('./ultralytics/yolov5', 'custom', path='SmartPhone_best.pt', source='local')
         self.model.to(device)  # 모델을 GPU로 이동
     
 class Client:
@@ -48,12 +48,7 @@ class Client:
             self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_AREA)
             cv2.imshow('PC_cam', self.resize_frame)
             results = self.model.model(self.resize_frame)  # 수정됨
-            # results.print()
-            results.show()
-            # DataFrame
-            # print(results.pandas().xyxy[0][])
-            # Series
-            # print(results.pandas().xyxy[0].confidence.values)
+            # results.show()
 
             isFlag = False
             for value in results.pandas().xyxy[0].confidence.values:
@@ -69,17 +64,8 @@ class Client:
                 self.sendall(screen_shot, screen_shot_length)
                 self.sendall(data, data_length)
                 print('데이터를 보냈습니다...')
-            
 
-            # if results.pandas().xyxy[0].confidence >= 0.6:
-            #     cam_img, cam_length = self.img_encoding(self.resize_frame)
-            #     screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
-            #     data, data_length = self.get_infomation()
-
-            #     self.sendall(cam_img, cam_length)
-            #     self.sendall(screen_shot, screen_shot_length)
-            #     self.sendall(data, data_length)
-
+            cv2.waitKey(1)
             time.sleep(1)
         
         self.client_socket.close()
@@ -121,7 +107,7 @@ class Client:
     def get_port(self):
         return self.__TCP_PORT
     
-HOST = '192.168.50.187'
+HOST = '192.168.50.131'
 PORT = 9999
 
 client = Client(HOST, PORT)
