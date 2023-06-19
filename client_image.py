@@ -45,6 +45,15 @@ class Client:
             self.resize_frame = cv2.resize(self.frame, dsize=(640, 640), interpolation=cv2.INTER_LINEAR)
             cv2.imshow('PC_cam', self.resize_frame)
 
+            if cv2.waitKey() == ord('q'):
+                cam_img, cam_length = self.img_encoding(self.resize_frame)
+                screen_shot, screen_shot_length = self.img_encoding(self.get_util().screen_shot())
+                data, data_length = self.get_infomation()
+
+                self.sendall(cam_img, cam_length)
+                self.sendall(screen_shot, screen_shot_length)
+                self.sendall(data, data_length)
+
             # results = self.model.model(self.resize_frame)
             # results.show()
             # isFlag = False
@@ -109,8 +118,5 @@ class Client:
 HOST = '192.168.50.131'
 PORT = 9999
 client = Client(HOST, PORT, 333)
-
-
-
 
 
