@@ -10,6 +10,7 @@
 .project
 /yolov5
 *.pt
+/ultralytics
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

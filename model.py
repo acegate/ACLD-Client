@@ -9,4 +9,5 @@ class ModelYolo:
         #     torch.cuda.set_device(0)  #원하는 GPU 장치 번호로 설정
         # 모델 로드
         self.model = torch.hub.load('./ultralytics/yolov5', 'custom', path='SmartPhone_best.pt', source='local')
+        
         # self.__model.to(device)  # 모델을 GPU로 이동
