@@ -9,7 +9,8 @@ from tkinter import *
 from util import Util
 import json
 from model import ModelYolo
-    
+import ctypes
+
 class Client:
     def __init__(self, TCP_IP, TCP_PORT, saborn):
         self.__saborn = saborn
@@ -48,7 +49,7 @@ class Client:
             # DataFrame
             # print(results.pandas().xyxy[0][])
             # Series
-            print(results.pandas().xyxy[0].confidence.values)
+            # print(results.pandas().xyxy[0].confidence.values)
             results = self.model.model(self.resize_frame)
             # results.show()
 
@@ -65,11 +66,12 @@ class Client:
                 self.sendall(cam_img, cam_length)
                 self.sendall(screen_shot, screen_shot_length)
                 self.sendall(data, data_length)
+                ctypes.windll.user32.LockWorkStation()
                 print('send...')
-            
+
             cv2.waitKey(1)
             time.sleep(1)
-        
+            
         self.client_socket.close()
         self.capture.release()
         cv2.destroyAllWindows()

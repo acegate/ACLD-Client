@@ -1,9 +1,10 @@
 from tkinter import *
 from client_image import Client
 import threading
+import ctypes
 
-SABORN = '23051489'
-host = '192.168.50.131'
+SABORN = '00123'
+host = '192.168.0.13'
 port = '9999'
 
 class Window:
